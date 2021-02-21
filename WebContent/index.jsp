@@ -17,18 +17,21 @@
 
 //일반사용자 접근
 //http://localhost:8080/sheep/index.jsp?id=BGHJ01&pw=bghj01
-
+//http://localhost:8080/sheep/index.jsp?id=TEST&pw=TEST
 
 int sessionHashCode = session.getId().hashCode();
 
 String remoteIp = request.getRemoteAddr();
 
-String id = request.getParameter("id"); 	
-String pw = request.getParameter("pw"); 	
+String id = request.getParameter("id");
+String pw = request.getParameter("pw");
+
+if(id==null ) id="TEST";
+if(pw==null ) pw="TEST";
 
 
 
-DBManager dbm = new DBManager((DataSource)application.getAttribute("jdbc/mysql_ds"));	
+DBManager dbm = new DBManager((DataSource)application.getAttribute("jdbc/mysql_ds"));
 
 EmsHashtable[] hash = dbm.selectMultipleRecord("select /*+ rule */ * from user_info where LOGINID=UPPER(?)",
 		new String[] { id });
@@ -39,18 +42,18 @@ String STATUS="";
 String ACCESSPW="";
 
 try{
-	
-	
+
+
 
 if(hash!=null && hash.length>0){
-	STATUS = hash[0].getString("STATUS");		
-	ACCESSPW = hash[0].getString("ACCESSPW");		
-	LOGINID = hash[0].getString("LOGINID");	
-	
+	STATUS = hash[0].getString("STATUS");
+	ACCESSPW = hash[0].getString("ACCESSPW");
+	LOGINID = hash[0].getString("LOGINID");
+
 	session.setAttribute("userinfo",hash[0]);		//일반유저세션관리
 	session.setAttribute("ADMIN","false");			//일반유저세션관리
 	session.setMaxInactiveInterval(60*30);	//30분
-				
+
 }
 
 
@@ -67,15 +70,15 @@ if(hash!=null && hash.length>0){
 <html>
     <head>
         <title></title>
-        <link rel="stylesheet" href="./css/pub.css" type="text/css"> 
+        <link rel="stylesheet" href="./css/pub.css" type="text/css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <Script Language="JavaScript" src="./js/common/messcript.js"></script>
 
-<SCRIPT language=javascript> 
+<SCRIPT language=javascript>
 
 
 function init(){
-	
+
 
 <%
 if(ACCESSPW.equals("")){
@@ -112,7 +115,6 @@ document.location.href='<%=request.getContextPath()%>/cal2.jsp';
 
 }
 
-</SCRIPT> 
+</SCRIPT>
 <body onload="init()">
-</body>      
-	
+</body>

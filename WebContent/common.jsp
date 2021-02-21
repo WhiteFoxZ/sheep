@@ -1,5 +1,5 @@
 <%@ page pageEncoding="UTF-8" %>
-    
+
 
 <%@ include file="include.jsp" %>
 
@@ -7,20 +7,20 @@
 <%
 
 
-if(userinfo!=null){	           
-    
+if(userinfo!=null){
+
   String event = request.getParameter("event");
   if (event == null) {
       event = "find";
   }
 
   int sessionHashCode = session.getId().hashCode();
-  
+
   COMMON book = new COMMON(application,request, userinfo, sessionHashCode);
 
-  
+
   EmsHashtable[] hash  = (EmsHashtable[])request.getAttribute("hash");
-  
+
 
 
 %>
@@ -43,39 +43,39 @@ if(userinfo!=null){
 
 
         <SCRIPT language=javascript>
-		
+
         $.mobile.ajaxEnabled = false;
-        
+
         var submitFlag=true;
-        
+
 
             function setEvent(event){
-            	                   	     
+
 	            if(submitFlag==true){
 	                document.frmMain.event.value=event;
 	                submitFlag=false;
 	                document.frmMain.submit();
 	                return false;
-	                
+
 	            }
-                
-                
-            }   
-            
+
+
+            }
+
             function init(){
 
             	<%
             	String msg = request.getAttribute("msg")!=null?request.getAttribute("msg").toString():null;
-            	
+
             	if(msg!=null && msg.length()>0){
-            	%>            	
-            	
+            	%>
+
             	var msgText="<%=msg%>";
             	var textVisible="true";
             	var textonly="true";
             	var theme="a";
             	var html="";
-            	            	
+
             	$.mobile.loading( "show", {
             		text: msgText,
             		textVisible: textVisible,
@@ -83,19 +83,19 @@ if(userinfo!=null){
             		textonly: textonly,
             		html: html
             	});
-            	
-            	
+
+
             	var timer = setTimeout(hideMsg, 1000);
-            	
+
             	<%}%>
             }
-            
-            
-            function hideMsg(){            	            	
-            	$.mobile.loading( "hide" );            	
+
+
+            function hideMsg(){
+            	$.mobile.loading( "hide" );
             }
-            
-            
+
+
         </script>
 
 <style type="text/css">
@@ -103,11 +103,11 @@ if(userinfo!=null){
 <%if(!mobile){ %>
 
 table th,td {
-    padding:10px;    
+    padding:10px;
     text-align:right;
 }
 table.lamp th,td {
-    padding:10px;    
+    padding:10px;
     text-align:l;
 }
 
@@ -115,18 +115,18 @@ table.lamp th,td {
 .input1         {font-family:"돋움","Verdana"; font: 12px;width:130;margin-top:1px}
 
 
-    
+
 
 <%}else{ %>
 <!--모바일일경우 폰트 더작게.-->
 .ui-mini {
 	font-size: 12px;
-}    
+}
 
 
 <%} %>
-</style>	      
-        
+</style>
+
 </head>
 
 
@@ -135,16 +135,16 @@ table.lamp th,td {
 <form name="frmMain" method="post" onsubmit="return false;"  >
 
 <input type="hidden" name="event" value="" />
-       
+
        <section id="page1" data-role="page">
-				
+
 				<header data-role="header">
 
-                <jsp:include page="header.jsp" flush="true"/>         
+                <jsp:include page="header.jsp" flush="true"/>
 
-               </header>                                              
+               </header>
 
-               <div class="content" data-role="content"> 
+               <div class="content" data-role="content">
 
 <table width="100%" border=0>
 <tr>
@@ -152,7 +152,7 @@ table.lamp th,td {
 
 <%if(mobile){ %>
 
-<a class="ui-btn ui-btn-inline ui-mini ui-icon-edit ui-btn-icon-left" onclick="setEvent('modify');">수정</a>           
+<a class="ui-btn ui-btn-inline ui-mini ui-icon-edit ui-btn-icon-left" onclick="setEvent('modify');">수정</a>
 
 <%}else{ %>
 
@@ -162,61 +162,61 @@ table.lamp th,td {
 
 	</td>
 </tr>
-</table>       
+</table>
 
-    		              
-<table id="table-custom-2" 	
-	class="ui-body-d ui-shadow table-stripe ui-responsive" 
-	data-role="table"  
+
+<table id="table-custom-2"
+	class="ui-body-d ui-shadow table-stripe ui-responsive"
+	data-role="table"
 	data-column-popup-theme="a"
     data-column-btn-theme="b">
     <%
-    int idx=1; 
-    %>   
-	<thead>				
+    int idx=1;
+    %>
+	<thead>
 		<tr class="ui-bar-a">
 			<th data-priority="<%=idx++ %>">CHK</th>
 			<th data-priority="<%=idx++ %>">CD_GROUP_ID</th>
-			<th data-priority="<%=idx++ %>">CD_GROUP_NM</th>								
-			<th data-priority="<%=idx++ %>">CD_ID</th>						
+			<th data-priority="<%=idx++ %>">CD_GROUP_NM</th>
+			<th data-priority="<%=idx++ %>">CD_ID</th>
 			<th data-priority="<%=idx++ %>">CD_MEANING</th>
 			<th data-priority="<%=idx++ %>">PRICE</th>
 			<th data-priority="<%=idx++ %>">EXT1</th>
-			<th data-priority="<%=idx++ %>">EXT2</th>			
-			<th data-priority="<%=idx++ %>">SORT</th>		
-			
+			<th data-priority="<%=idx++ %>">EXT2</th>
+			<th data-priority="<%=idx++ %>">SORT</th>
+
 		</tr>
 	</thead>
 	<tbody >
 	<%
 	if(hash!=null){
 		for (int i = 0; i < hash.length; i++) {
-	%>				
-		<tr >				
-						
-			<th >						
+	%>
+		<tr >
+
+			<th >
 			<input type="checkbox" id="chk" name="chk" value="<%=i%>" data-role="none"  >
-			<input type="HIDDEN" name="PK_CD_ID" value="<%=hash[i].getString("CD_ID")%>" data-role="none"  >					
+			<input type="HIDDEN" name="PK_CD_ID" value="<%=hash[i].getString("CD_ID")%>" data-role="none"  >
 			</th>
 			<td><input type="text" name="CD_GROUP_ID"   value="<%=hash[i].getString("CD_GROUP_ID")%>"  data-role="none" ></td>
 			<td><input type="text" name="CD_GROUP_NM" value="<%=hash[i].getString("CD_GROUP_NM")%>"  data-role="none" ></td>
 			<td><input type="text" name="CD_ID" 	  value="<%=hash[i].getString("CD_ID")%>"  data-role="none" ></td>
 			<td><textarea name="CD_MEANING"  rows="1" cols="30"><%=hash[i].getString("CD_MEANING")%></textarea></td>
 			<td><input type="text" name="PRICE" 	  style="width:60px;" value="<%=hash[i].getString("PRICE")%>"  data-role="none" ></td>
-			<td><input type="text" name="EXT1" 		  style="width:50px;" value="<%=hash[i].getString("EXT1")%>"  data-role="none" ></td>
-			<td><input type="text" name="EXT2" 		  style="width:50px;" value="<%=hash[i].getString("EXT2")%>"  data-role="none" ></td>			
-			<td><input type="text" name="SORT_SEQ" 	  style="width:50px;" value="<%=hash[i].getString("SORT_SEQ")%>"  data-role="none" ></td>								
-		</tr>	
+			<td><input type="text" name="EXT1" 		  style="width:150px;" value="<%=hash[i].getString("EXT1")%>"  data-role="none" ></td>
+			<td><input type="text" name="EXT2" 		  style="width:50px;" value="<%=hash[i].getString("EXT2")%>"  data-role="none" ></td>
+			<td><input type="text" name="SORT_SEQ" 	  style="width:50px;" value="<%=hash[i].getString("SORT_SEQ")%>"  data-role="none" ></td>
+		</tr>
 	<%	}	//end of for
-		
+
 	}%>
 	</tbody>
 </table>
 </div>
-		            
+
        </section>
-</form>       
-</body> 
+</form>
+</body>
 
 
 
@@ -225,8 +225,8 @@ table.lamp th,td {
 
 <!-- html 끝 -->
 <%
-    
-    	
+
+
 }else{	//LOGIN 정보가 없을때
 %>
 

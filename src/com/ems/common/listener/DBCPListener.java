@@ -4,6 +4,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import com.ems.common.captch.CaptchaServiceSingleton;
 import com.ems.common.dbcp.DBCPManager;
 import com.ems.common.dbcp.DataSource;
 
@@ -12,35 +13,35 @@ public class DBCPListener implements ServletContextListener {
     private org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger( this.getClass() );
 
     DBCPManager dbcp=null;
-    
-    
+
+
     public void contextInitialized(ServletContextEvent event) {
         context = event.getServletContext();
-                
+
         dbcp = DBCPManager.getInstance("mysql.db.properties");
-        
+
         com.ems.common.dbcp.DataSource ds = dbcp.getDatasource();
-        
+
         log.info("최초생성 "+ds.toString());
-        
-        context.setAttribute(dbcp.getDataSourceName(),dbcp.getDatasource()); 
-                        
+
+        context.setAttribute(dbcp.getDataSourceName(),dbcp.getDatasource());
+
     }
 
     public void contextDestroyed(ServletContextEvent event) {
-        context = event.getServletContext();                
-        
-        try {            
-        
+        context = event.getServletContext();
+
+        try {
+
         	DataSource ds = (DataSource)context.getAttribute(dbcp.getDataSourceName());
-        	
+
         	if(ds!=null){
 
-        	
+
         	log.info("종료전 "+ds.toString());
-        	
+
         	ds.close();
-        	
+
         	log.info("종료후 "+ds.toString());
         	}
 
@@ -48,9 +49,9 @@ public class DBCPListener implements ServletContextListener {
         } catch (Exception e) {
             e.printStackTrace();
         }finally{
-        	
+
         }
     }
 
-    
+
 }

@@ -38,18 +38,18 @@ session.invalidate();
 
 <title>LogOut</title>
 
-       
-        
-        
+
+
+
 
 </head>
 
 
 <body  >
 
-            
+
 <section id="page1" data-role="page">
-			
+
 <div class="content" data-role="content" align="center" >
 
 <div class="ui-body ui-body-a">
@@ -57,17 +57,17 @@ session.invalidate();
 
 방문해 주셔서  감사합니다.
 
-<BR>더나은 캠핑장이 되도록 노력하겠습니다.
+
 
 </h4>
 
 </div>
 
 </div>
-              
+
 </section>
 
-</body> 
+</body>
 
 
 

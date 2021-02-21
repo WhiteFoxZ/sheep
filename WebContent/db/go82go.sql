@@ -3,9 +3,19 @@
 -- http://www.phpmyadmin.net
 --
 -- 호스트: localhost
--- 처리한 시간: 16-10-13 20:05 
+-- 처리한 시간: 16-10-13 20:05
 -- 서버 버전: 5.1.45
 -- PHP 버전: 5.2.17p1
+
+CREATE DATABASE fishfox;
+fishfox / fishfox1
+
+create user 'fishfox'@'%' identified by 'fishfox1';
+
+grant all privileges on fishfox.* to 'fishfox'@'%' ;
+
+
+
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
