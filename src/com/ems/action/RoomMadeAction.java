@@ -1,6 +1,9 @@
 package com.ems.action;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 
 import javax.servlet.RequestDispatcher;
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.ems.common.captch.CaptchaServiceSingleton;
 import com.ems.common.dbcp.DBManager;
 import com.ems.common.dbcp.DataSource;
+import com.ems.common.encrypt.AES256Util;
 import com.ems.common.smtp.GMailSender;
 import com.ems.common.util.EmsDateUtil;
 import com.ems.common.util.EmsHashtable;
@@ -35,7 +39,7 @@ public class RoomMadeAction {
 
 	String msg="";
 
-
+	private AES256Util aes;
 
 
 	public RoomMadeAction(ServletContext application,HttpServletRequest request, HttpServletResponse response,EmsHashtable userinfo, int sessionHashCode) {
@@ -50,7 +54,14 @@ public class RoomMadeAction {
 
 		dbm = new DBManager(ds);
 
-		System.out.println("시작");
+
+		try {
+			aes = new AES256Util("asdwsx1031902461");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 
 
 	    String event = request.getParameter("event");
@@ -92,6 +103,20 @@ public class RoomMadeAction {
 
 
 
+		try {
+			USER_TEL1 = aes.encrypt( USER_TEL1 );
+		} catch (NoSuchAlgorithmException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (GeneralSecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+
 		//그룹키 : 예약일자FROM(10) + 예약일자TO(10) +방번호(2) = 22 자리 GROUP_KEY
 
 
@@ -101,7 +126,7 @@ public class RoomMadeAction {
 		if(!validate()){
 
 			request.setAttribute("RESERVE_DATE", RESERVE_DATE);
-			request.setAttribute("USER_TEL1", USER_TEL1);
+			request.setAttribute("USER_TEL1", USER_TEL1 );
 			request.setAttribute("ROOM_NUM", ROOM_NUM);
 			request.setAttribute("MEMO", MEMO);
 

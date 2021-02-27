@@ -4,6 +4,7 @@
 
 <%@ include file="include.jsp" %>
 
+<%@ page import="com.ems.common.encrypt.AES256Util"%>
 
 <%
 
@@ -82,9 +83,11 @@ if(userinfo!=null){
     }
 
     //배위치사진
-    EmsHashtable[] postion = dbm.selectMultipleRecord("SELECT CD_MEANING  FROM comm_info INFO where INFO.CD_GROUP_ID='SHIP_POSTION' AND INFO.LOGIN_ID=?  ",
+    EmsHashtable[] postion = dbm.selectMultipleRecord("SELECT CD_MEANING , EXT1  FROM comm_info INFO where INFO.CD_GROUP_ID='SHIP_POSTION' AND INFO.LOGIN_ID=?  ",
     		new String[] { LOGINID });
 
+
+	AES256Util aes = new AES256Util("asdwsx1031902461");
 
 
     String perid=null;
@@ -366,13 +369,10 @@ font-size: 0.85em;
 
 ● 이름 :
 <input type="text" id="P_NAME" name="P_NAME" value="<%=P_NAME %>"  data-role="none"  />
-
-
+&nbsp;
+<a class="ui-btn ui-btn3 ui-btn-inline ui-icon-search ui-btn-icon-left" onclick="setEvent('find');">조회</a>
 <a class="ui-btn ui-btn3 ui-btn-inline ui-icon-edit ui-btn-icon-left" onclick="setEvent('modify');">입금확인</a>
 <a class="ui-btn ui-btn3 ui-btn-inline ui-icon-edit ui-btn-icon-left" onclick="setEvent('cancel');">입금취소</a>
-
-
- <a class="ui-btn ui-btn3 ui-btn-inline ui-icon-search ui-btn-icon-left" onclick="setEvent('find');">조회</a>
 <a class="ui-btn ui-btn3 ui-btn-inline ui-icon-delete ui-btn-icon-left" onclick="setEvent('delete');">예약삭제</a>
 
 
@@ -398,20 +398,42 @@ font-size: 0.85em;
 <input type="hidden" name="rdate" value="<%=rdate %>" />
 
 <div class="ui-body ui-body-a">
-  <h1>예약일 : <%=rdate %>&nbsp;<b style="color: red;">[<%=fishtype %>]</b>
-  
-  자리배치 :
-  
+
+
+  <%if(!mobile){ %>
+
+  <h1 style='margin-top:10px; margin-bottom: 10px; '>예약일 : <%=rdate %>&nbsp;<b style="color: red;">[<%=fishtype %>]</b>
+
+
+     &nbsp;&nbsp;&nbsp;★자리위치사진 :
+
   <%for(int i=0; i<postion.length; i++){ %>
 
-<a href="<%=postion[i].getString("CD_MEANING") %>" target="_blank" />사진<%=i%></a>&nbsp;|&nbsp;
+<a href="<%=postion[i].getString("CD_MEANING") %>" target="_blank" /><%=postion[i].getString("EXT1")%></a>&nbsp;
+<%=i<postion.length-1?"|&nbsp;":""%>
+
+  <%}%>
+
+  </h1>
+
+
+
+  <%}else{%>
+
+<h1 style='margin-top:5px; margin-bottom: 3px; font-size:17px;' >예약일 : <%=rdate %>&nbsp;<b style="color: red;">[<%=fishtype %>]</b></h1>
+
+
+  ★자리위치사진 :
+
+  <%for(int i=0; i<postion.length; i++){ %>
+
+<a href="<%=postion[i].getString("CD_MEANING") %>" target="_blank" /><%=postion[i].getString("EXT1")%></a>&nbsp;
+<%=i<postion.length-1?"|&nbsp;":""%>
+
 
   <%} %>
-  
-  
-  </h1>  
-  
-  
+
+  <%} %><!-- if(!mobile) -->
 
 </div>
 
@@ -438,7 +460,7 @@ if(ADMIN!=null && ADMIN.equals("true")){ %>
 			<th data-priority="<%=idx++ %>">상태</th>
 			<th data-priority="<%=idx++ %>">버튼</th>
 <%}else{ %>
-			<th data-priority="<%=idx++ %>">데크No</th>
+			<th data-priority="<%=idx++ %>">자리No</th>
 			<th data-priority="<%=idx++ %>">이름</th>
 			<th data-priority="<%=idx++ %>">전화</th>
 			<th data-priority="<%=idx++ %>">기간</th>
@@ -452,7 +474,16 @@ if(ADMIN!=null && ADMIN.equals("true")){ %>
 	<%
 	if(hash!=null){
 
+		String USER_TEL1="";
+
 		for (int i = 0; i < hash.length;  i++) {
+
+			if(hash[i].getString("USER_TEL1").length()>0){
+				USER_TEL1 = aes.decrypt( hash[i].getString("USER_TEL1") );
+				log(hash[i].getString("USER_TEL1") + " : "+USER_TEL1);
+			}else{
+				USER_TEL1="";
+			}
 
 			if(intMan>0 && i>=intMan)break;
 	%>
@@ -468,7 +499,7 @@ if(ADMIN!=null && ADMIN.equals("true")){ %>
 			<td ><%=hash[i].getString("CREATION_TIMESTAMP")%></td>
 
 			<td><%=hash[i].getString("USER_NAME")%></td>
-			<td><%=hash[i].getString("USER_TEL1")%></td>
+			<td><%=USER_TEL1%></td>
 			 <!--
 			<td>
 				<%=hash[i].getString("CAR_NUM")%>
@@ -550,12 +581,13 @@ if(ADMIN!=null && ADMIN.equals("true")){ %>
 			<td>
 			<%
 
-			String tel[] = hash[i].getString("USER_TEL1").split("-");
+
+			String tel[] =USER_TEL1.split("-") ;
 
 			if(tel.length==3)
 				out.println(tel[0] +"-****-"+tel[2]);
 			else
-				out.println(hash[i].getString("USER_TEL1").replaceAll("2", "*").replaceAll("3", "*").replaceAll("4", "*"));
+				out.println(!USER_TEL1.equals("")?aes.maskify(USER_TEL1):"");
 
 			%>
 			</td>

@@ -80,7 +80,7 @@ sb.append(" AND LOGIN_ID=?                                                      
     EmsHashtable[] hash_deck = dbm.selectMultipleRecord("SELECT CD_ID,CD_MEANING,PRICE FROM comm_info WHERE CD_GROUP_ID='ROOM_NUM' AND LOGIN_ID=? AND CD_ID=? ",
     		new String[] { LOGINID,room_num });
 
-    String deck_desc = hash_deck[0].getString("CD_MEANING");	//데크설명
+    String deck_desc = hash_deck[0].getString("CD_MEANING");	//자리설명
 
     message =  deck_desc +"<P>"+ message;
 
@@ -441,7 +441,7 @@ max-height: 700px;
 
          	if(hot_day_cnt>0){
 //         		var html="성수기:"+hot_day_cnt+"일["+HOT_PRICE+"]";
-         		var html=""+hot_day_cnt+"일["+HOT_PRICE+"]";         		
+         		var html=""+hot_day_cnt+"일["+HOT_PRICE+"]";
 
          		if(default_day>0)
 //        		html=html+"+비성수기:"+default_day+"일["+MAIN_PRICE+"]";
@@ -538,12 +538,12 @@ $(function() {
 <div class="content" data-role="content">
 
 
-<h3>데크No : <%=room_num %></h3>
+<h3>자리No : <%=room_num %></h3>
 
 
 <div data-role="collapsible" class="jqm-demos jqm-content">
 
-<h2>데크이미지</h2>
+<h2>자리이미지</h2>
 
 
 <div id="attch_roomImg" >
@@ -580,7 +580,7 @@ $(function() {
 </div>
 
 <div class="ui-body ui-body-a">
- <!-- 데크설명 -->
+ <!-- 자리설명 -->
 <p><%=message %>
 
 </div>

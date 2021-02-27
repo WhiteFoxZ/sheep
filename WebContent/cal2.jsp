@@ -61,7 +61,7 @@
     		new String[] { userinfo.getString("LOGINID"),firstDay,firstDay });
 
 
-  	//데크갯수
+  	//자리갯수
       EmsHashtable[] hash2 = dbm.selectMultipleRecord("select count(CD_ID) CNT  from comm_info where CD_GROUP_ID='ROOM_NUM' and LOGIN_ID=? ",
       		new String[] { userinfo.getString("LOGINID") });
 
@@ -134,8 +134,8 @@
 
 div.Box {position:relative; width:100%; height:100%;;}
 div.head {float:left; width:100%; height:30%; font-size: 13px;color: red; margin-top: 0px;}
-div.body {clear:left; float:left; width:100%; height:40%; font-size: 21px;  }
-div.foot {position:absolute; clear:left; float:left; width:100%; height:20%; ; bottom:0px; font-size: 13px;color: black;}
+div.body {clear:left; float:left; width:100%; height:45%; font-size: 20px;  }
+div.foot {position:absolute; clear:left; float:left; width:100%; height:25%; ; bottom:0px; font-size: 13px;color: black;}
 
 div.body2 {clear:left; float:left; width:100px; height:100px; font-size: 18px; display: flex; align-items: center; }
 
@@ -329,11 +329,11 @@ function year_onchange()
 	       	int totalSiteCnt = Integer.parseInt( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
 
 	       	//남은자리수
-	       	int leftSiteCnt = totalSiteCnt - Integer.parseInt(dayHash.getString(EmsNumberUtil.format(i,"00")));
+	       	int leftSiteCnt =0;
 
 
 
-       		if(leftSiteCnt!=0){
+
 
       			sb.append("<div class='head '>");
       	  		sb.append( fishHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
@@ -346,36 +346,25 @@ function year_onchange()
 
 	       		sb.append("<div class='foot'>");
 
-	       		sb.append( dayHash.getString(EmsNumberUtil.format(i,"00")) );
-	       		sb.append("/");
-	       		sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
 
-	       		sb.append("</div>");
+	       		leftSiteCnt = Integer.parseInt( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) )
+	       						   -
+	       						   Integer.parseInt( dayHash.getString(EmsNumberUtil.format(i,"00"))  );
 
-       		}else{
+	       		sb.append( leftSiteCnt );
+	       		//sb.append("/");
 
+	       		//sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
 
+	       		sb.append(" 예약가능</div>");
 
-					sb.append("<div class='head '>");
-					sb.append( fishHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
-					sb.append("</div>");
-
-
-					sb.append("<div class='body'>");	//날짜
-					sb.append(i);	//날짜
-					sb.append("</div>");	//날짜
-
-					sb.append("<div class='foot'>");
-
-					sb.append( dayHash.getString(EmsNumberUtil.format(i,"00")) );
-					sb.append("/");
-					sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+				if(leftSiteCnt==0)
 					sb.append( "&nbsp;예약마감" );
 
 
 					sb.append("</div>");
 
-       		}
+
 
 
 
@@ -396,7 +385,7 @@ function year_onchange()
 			sb.append("<div class='foot'>");
 
 
-			sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+			sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );	//낚시 종류별 가능인원수
 
 
 			sb.append("</div>");
@@ -427,6 +416,10 @@ function year_onchange()
 
    %>
   </table >
+
+<!--
+  <div align=center style='margin-top:10px;'>설명 : 예약가능/출조총원</div>
+ -->
 
 
 </div> <!-- content -->
