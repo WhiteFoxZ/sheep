@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="UTF-8"?> 
-<queryMap desc=""> 
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<queryMap desc="">
 
 	 <list_sql id="list_sql" desc="예약정보조회" >
-		 <![CDATA[ 
+		 <![CDATA[
 SELECT A.CD_ID ,A.CD_MEANING, A.EXT1
 , B.RESERVE_INFO_ID
 , B.USER_NAME
@@ -16,20 +16,20 @@ SELECT A.CD_ID ,A.CD_MEANING, A.EXT1
 , B.LOGIN_ID
 , B.RESERVE_STATE
 , (SELECT CD_MEANING FROM comm_info WHERE CD_GROUP_ID='RESERVE_STATE' AND CD_ID=B.RESERVE_STATE) AS RESERVE_STATE_NAME
-, B.ROOM_NUM 
+, B.ROOM_NUM
 , B.GROUP_KEY
-, B.TOTAL_PAY
+, FORMAT(B.TOTAL_PAY, 0) as TOTAL_PAY
 , B.PRICE_DESC
 
- FROM comm_info A LEFT OUTER JOIN reserve_info B ON A.CD_ID =B.ROOM_NUM 
- AND B.RESERVE_DATE between ? and ? 
- AND B.LOGIN_ID=? 
+ FROM comm_info A LEFT OUTER JOIN reserve_info B ON A.CD_ID =B.ROOM_NUM
+ AND B.RESERVE_DATE between ? and ?
+ AND B.LOGIN_ID=?
 WHERE A.CD_GROUP_ID='ROOM_NUM' AND A.LOGIN_ID=?
-		 ]]> 
+		 ]]>
 	 </list_sql>
 
 	 <list_sql2 id="list_sql2" desc="미입금된 예약정보조회" >
-		 <![CDATA[ 
+		 <![CDATA[
 SELECT A.CD_ID ,A.CD_MEANING
 , B.RESERVE_INFO_ID
 , B.USER_NAME
@@ -42,48 +42,48 @@ SELECT A.CD_ID ,A.CD_MEANING
 , B.LOGIN_ID
 , B.RESERVE_STATE
 , (SELECT CD_MEANING FROM comm_info WHERE CD_GROUP_ID='RESERVE_STATE' AND CD_ID=B.RESERVE_STATE) AS RESERVE_STATE_NAME
-, B.ROOM_NUM 
+, B.ROOM_NUM
 , B.GROUP_KEY
 , B.LAST_UPDATE_TIMESTAMP
 , B.PRICE_DESC
- FROM 
- ( select CD_ID, CD_MEANING from comm_info where CD_GROUP_ID='ROOM_NUM' AND LOGIN_ID=? ) A 
- INNER JOIN 
- ( SELECT * FROM reserve_info FORCE INDEX (idx_reserve_info_RESERVE_DATE) WHERE 
+ FROM
+ ( select CD_ID, CD_MEANING from comm_info where CD_GROUP_ID='ROOM_NUM' AND LOGIN_ID=? ) A
+ INNER JOIN
+ ( SELECT * FROM reserve_info FORCE INDEX (idx_reserve_info_RESERVE_DATE) WHERE
      RESERVE_DATE between DATE_ADD(NOW(), INTERVAL -10 DAY) and DATE_ADD(NOW(), INTERVAL 10 DAY)
- AND LOGIN_ID=? 
- AND RESERVE_STATE='1' 
- and DATEDIFF( now(), LAST_UPDATE_TIMESTAMP) between 2 and 3 
- ) B 
+ AND LOGIN_ID=?
+ AND RESERVE_STATE='1'
+ and DATEDIFF( now(), LAST_UPDATE_TIMESTAMP) between 2 and 3
+ ) B
  ON A.CD_ID =B.ROOM_NUM
-		 ]]> 
-	 </list_sql2>	 
-	 	 	 
+		 ]]>
+	 </list_sql2>
+
 	 <update_sql id="update_sql" desc="어드민 예약 상태변경" >
-		 <![CDATA[ 
+		 <![CDATA[
 			UPDATE reserve_info SET
-			 RESERVE_STATE=?			
-			WHERE GROUP_KEY=? AND LOGIN_ID=?				
-		 ]]> 
+			 RESERVE_STATE=?
+			WHERE GROUP_KEY=? AND LOGIN_ID=?
+		 ]]>
 	 </update_sql>
 
 	 <delete_sql id="delete_sql" desc="어드민 예약 삭제" >
-		 <![CDATA[ 
-			delete from reserve_info		
-			WHERE GROUP_KEY=? AND LOGIN_ID=?	 											
-		 ]]> 
+		 <![CDATA[
+			delete from reserve_info
+			WHERE GROUP_KEY=? AND LOGIN_ID=?
+		 ]]>
 	 </delete_sql>
 
 	 <delete_tel_sql id="delete_tel_sql" desc="어드민 예약 삭제" >
-		 <![CDATA[ 
-delete from reserve_info		
-			WHERE GROUP_KEY=? and REPLACE(USER_TEL1 ,'-','')=REPLACE(?,'-','') AND LOGIN_ID=?									
-		 ]]> 
-	 </delete_tel_sql>	 
-	 	 
-	 
+		 <![CDATA[
+delete from reserve_info
+			WHERE GROUP_KEY=? and REPLACE(USER_TEL1 ,'-','')=REPLACE(?,'-','') AND LOGIN_ID=?
+		 ]]>
+	 </delete_tel_sql>
+
+
 	 <insert_sql id="insert_sql" desc="어드민 예약 상태변경" >
-		 <![CDATA[ 
+		 <![CDATA[
 INSERT INTO reserve_info
 (USER_NAME,
 USER_TEL1,
@@ -120,11 +120,11 @@ VALUES
 ?,
 now()
 );
-								
-		 ]]> 
+
+		 ]]>
 	 </insert_sql>
-	 	 
-	 
-	 
+
+
+
 
 </queryMap>

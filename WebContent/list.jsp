@@ -480,7 +480,6 @@ if(ADMIN!=null && ADMIN.equals("true")){ %>
 
 			if(hash[i].getString("USER_TEL1").length()>0){
 				USER_TEL1 = aes.decrypt( hash[i].getString("USER_TEL1") );
-				log(hash[i].getString("USER_TEL1") + " : "+USER_TEL1);
 			}else{
 				USER_TEL1="";
 			}

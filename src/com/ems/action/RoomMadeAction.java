@@ -74,7 +74,12 @@ public class RoomMadeAction {
 	    if(event.equals("find")){
 
 	    }else if(event.equals("modify")){
-	    	modify();
+	    	try {
+				modify();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    }
 
 	}
@@ -88,7 +93,7 @@ public class RoomMadeAction {
 	/**
 	 * 일반사용자가 예약을 했을때 처리
 	 */
-	public void modify() {
+	public void modify() throws Exception{
 
 		String RESERVE_DATE = request.getParameter("RESERVE_DATE"); // 카드ID
 		String USER_TEL1 = request.getParameter("USER_TEL1"); // 카드ID
@@ -101,20 +106,6 @@ public class RoomMadeAction {
 		String TOTAL_PAY = request.getParameter("TOTAL_PAY");
 		String PRICE_DESC = request.getParameter("PRICE_DESC");
 
-
-
-		try {
-			USER_TEL1 = aes.encrypt( USER_TEL1 );
-		} catch (NoSuchAlgorithmException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (GeneralSecurityException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
 
 		//그룹키 : 예약일자FROM(10) + 예약일자TO(10) +방번호(2) = 22 자리 GROUP_KEY
@@ -225,7 +216,7 @@ public class RoomMadeAction {
 
 					dbm.insert(con, QueryXMLParser.getQuery(getClass(), "list.xml", "insert_sql"), new String[] {
 		                USER_NAME,
-		                USER_TEL1,
+		                aes.encrypt( USER_TEL1 ),
 		                "",//USER_EMAIL
 		                "",//ACCONT_NO,
 		                toDay,
@@ -249,12 +240,12 @@ public class RoomMadeAction {
 
 				msg="예약 처리되었습니다.";
 
-				String subject=GROUP_KEY+" 데크 예약이 되었습니다.";
+				String subject=GROUP_KEY+" 번자리 예약이 되었습니다.";
 
 				String to=userinfo.getString("EMAIL");		//관리자 메일
-				String content=USER_NAME+" ("+USER_TEL1+" )"+GROUP_KEY+" 데크 예약이 되었습니다.";
+				String content=USER_NAME+" ("+USER_TEL1+" )"+GROUP_KEY+" 번자리 예약이 되었습니다.";
 
-				new GMailSender().mailSender("이승용",subject, to, content);
+				new GMailSender().mailSender("예약시스템",subject, to, content);
 
 
 

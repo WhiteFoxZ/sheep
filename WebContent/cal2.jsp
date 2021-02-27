@@ -78,8 +78,6 @@
 
     	fishHash.put(hash0[hashCnt].getString("FISH_DAY"), hash0[hashCnt].getString("FISH_NAME"));
 
-    	log(hash0[hashCnt].getString("FISH_DAY")+" : "+hash0[hashCnt].getString("FISH_NAME"));
-
     	manHash.put(hash0[hashCnt].getString("FISH_DAY"), hash0[hashCnt].getString("MAN"));
     }
 
@@ -356,10 +354,10 @@ function year_onchange()
 
 	       		//sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
 
-	       		sb.append(" 예약가능</div>");
+	       		sb.append(" 가능</div>");
 
 				if(leftSiteCnt==0)
-					sb.append( "&nbsp;예약마감" );
+					sb.append( "&nbsp;마감" );
 
 
 					sb.append("</div>");

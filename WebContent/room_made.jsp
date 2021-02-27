@@ -99,6 +99,20 @@ sb.append(" AND LOGIN_ID=?                                                      
     		new String[] { LOGINID,room_num,rdate,rdate });
 
 
+	StringBuffer q1 = new StringBuffer("");
+	q1.append("SELECT INFO.CD_MEANING as IMG_URL, INFO.EXT1 AS FISH_TYPE, FISH.CD_MEANING AS FISHDAY  FROM comm_info INFO , comm_info FISH");
+	q1.append(" where INFO.CD_GROUP_ID='SHIP_POSTION' AND FISH.CD_GROUP_ID='FISH_TYPE' ");
+	q1.append(" AND INFO.LOGIN_ID=FISH.LOGIN_ID   ");
+	q1.append(" AND (case when INFO.EXT1='타이라바' then INFO.EXT1 else FISH.EXT1 END ) =FISH.EXT1 ");
+	q1.append(" AND INFO.LOGIN_ID=? AND FISH.CD_MEANING =? ");
+	q1.append(" order by FISH_TYPE desc ");
+
+
+
+  //배위치사진
+    EmsHashtable[] postion = dbm.selectMultipleRecord(q1.toString(),  		new String[] { LOGINID ,rdate.replaceAll("-", "") });
+
+
 
 
 %>
@@ -542,12 +556,31 @@ $(function() {
 
 
 <div data-role="collapsible" class="jqm-demos jqm-content">
+<!-- 첨부파일 기능은 아직 미완성 FileUploadServelt 에서 tnme , key 값 저장하도록 변경해야함. -->
 
-<h2>자리이미지</h2>
+<h2>
+
+
+ <%if(postion.length>0){ %>
+
+<%=postion[0].getString("FISH_TYPE")%>
+
+
+  <%}%>
+
+  <a href="#" >(자리위치 사진)</a>
+
+</h2>
 
 
 <div id="attch_roomImg" >
 </div>
+
+  <%if(postion.length>0){ %>
+
+<img src="<%=postion[0].getString("IMG_URL") %>"  />
+
+  <%}%>
 
 
     		 <% if(ADMIN.equals("true")){ %>
@@ -743,8 +776,4 @@ $(function() {
 <jsp:include page="userinfo.jsp" flush="true"/>
 
 <%} %>
-
-
-
-
 

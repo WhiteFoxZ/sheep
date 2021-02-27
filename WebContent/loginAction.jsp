@@ -17,11 +17,11 @@ int sessionHashCode = session.getId().hashCode();
 
 String remoteIp = request.getRemoteAddr();
 
-String id = request.getParameter("id"); 	
+String id = request.getParameter("id");
 String pw = request.getParameter("pw");
-String remember = request.getParameter("remember"); 
+String remember = request.getParameter("remember");
 
-DBManager dbm = new DBManager((DataSource)application.getAttribute("jdbc/mysql_ds"));	
+DBManager dbm = new DBManager((DataSource)application.getAttribute("jdbc/mysql_ds"));
 
 EmsHashtable[] hash = dbm.selectMultipleRecord("select /*+ rule */ USERNAME, TEL1, TEL2, LOGINID, LOGINPW, ACCESSPW, EMAIL, STATUS, IMG_UPLOAD from user_info where LOGINID=UPPER(?)",
 		new String[] { id });
@@ -32,37 +32,37 @@ String STATUS="";
 String LOGINPW="";
 
 try{
-	
-	
+
+
 
 if(hash!=null && hash.length>0){
-	STATUS = hash[0].getString("STATUS");		
-	LOGINPW = hash[0].getString("LOGINPW");		
-	LOGINID = hash[0].getString("LOGINID");	
-	
-	session.setAttribute("userinfo",hash[0]);	
+	STATUS = hash[0].getString("STATUS");
+	LOGINPW = hash[0].getString("LOGINPW");
+	LOGINID = hash[0].getString("LOGINID");
+
+	session.setAttribute("userinfo",hash[0]);
 	session.setAttribute("ADMIN","true");		//어드민세션관리
 	session.setMaxInactiveInterval(60*60*24);	//1일
 	//session.setMaxInactiveInterval(10);	//10초
-	log(hash[0].toString());
-	
+	//log(hash[0].toString());
+
 	Cookie cookie1 = new Cookie("LOGINID",LOGINID);
 	Cookie cookie2 = new Cookie("LOGINPW",LOGINPW);
-	
-			
+
+
 	if(remember!=null){
-				
+
 		cookie1.setMaxAge(60*60*24*1);			//3600 1시간
 		cookie2.setMaxAge(60*60*24*1);			//3600 1시간
 		response.addCookie(cookie1);
 		response.addCookie(cookie2);
 	}else{
-		
+
 		cookie1.setMaxAge(0);
 		cookie2.setMaxAge(0);
 		response.addCookie(cookie1);
 		response.addCookie(cookie2);
-	}		
+	}
 }
 
 
@@ -79,15 +79,15 @@ if(hash!=null && hash.length>0){
 <html>
     <head>
         <title>로그인중...</title>
-        <link rel="stylesheet" href="./css/pub.css" type="text/css"> 
+        <link rel="stylesheet" href="./css/pub.css" type="text/css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <Script Language="JavaScript" src="./js/common/messcript.js"></script>
 
-<SCRIPT language=javascript> 
+<SCRIPT language=javascript>
 
 
 function init(){
-	
+
 
 <%
 if(LOGINPW.equals("")){
@@ -126,6 +126,6 @@ document.location.href='<%=request.getContextPath()%>/cal2.jsp';
 
 }
 
-</SCRIPT> 
+</SCRIPT>
 <body onload="init()">
-</body>      
+</body>

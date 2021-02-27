@@ -70,6 +70,9 @@ public class FileUploadServlet extends HttpServlet {
 			response.setContentType("text/plain; charset=UTF-8");
 		}
 
+
+
+
 		PrintWriter out = response.getWriter();
 
 		RequestModel model = new RequestModel();
@@ -83,16 +86,16 @@ public class FileUploadServlet extends HttpServlet {
 			// 임시 저장폴더
 			File f = new File(contextRootPath
 					+ "/WEB-INF/temp");
-			
+
 			if(!f.exists()) f.mkdirs();
-			
+
 			System.out.println(f.getAbsolutePath()+" 존재 ? "+
 					f.exists()
 							);
-			
+
 			diskFactory.setRepository(f);
-			
-		
+
+
 
 			// 2. 업로드 요청을 처리하는 ServletFileUpload 생성
 			ServletFileUpload upload = new ServletFileUpload(diskFactory);
@@ -107,11 +110,11 @@ public class FileUploadServlet extends HttpServlet {
 			for (FileItem item : items) {
 
 				// 5. FileItem이 폼입력 항목인지 여부에 따라 알맞은 처리
-				if (item.isFormField()) { // 파일이 아닌경우					
+				if (item.isFormField()) { // 파일이 아닌경우
 					processFormField(model, item);
 				} else { // 파일인 경우
 					if (item.getSize() != 0) { // 업로드된 파일이 있을경우에만 처리
-						processUploadFile(model, item, contextRootPath);
+						processUploadFile(model, item, contextRootPath,request);
 					}
 				}
 			}
@@ -131,17 +134,23 @@ public class FileUploadServlet extends HttpServlet {
 			out.print("\"}");
 		}
 	}
-	
 
-	
 
-	// 파일 양식 처리	
+
+
+	// 파일 양식 처리
 	private void processUploadFile(RequestModel model, FileItem item,
-			String contextRootPath) throws Exception {
+			String contextRootPath,HttpServletRequest request ) throws Exception {
 
 		String name = item.getFieldName(); // 필드 이름 얻기
 		String fileName = item.getName(); // 파일명 얻기
 		String uploadedFileName=null;
+
+
+
+		String TABLE_NAME = request.getParameter("TABLE_NAME");
+		String TABLE_KEY = request.getParameter("TABLE_KEY");
+
 
 		fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
 
@@ -161,7 +170,7 @@ public class FileUploadServlet extends HttpServlet {
 		ResultSet rs=null;
 
 		BufferedInputStream bis = null;
-		
+
 
 		try {
 
@@ -169,34 +178,45 @@ public class FileUploadServlet extends HttpServlet {
 
 			int tf = 0;
 
-			ps = con.prepareStatement("insert into all_img_info(FILE_NAME,CONTENT_TYPE,FILE_SIZE,FILE) VALUES (?,?,?,?) ");
+			ps = con.prepareStatement("insert into all_img_info(FILE_NAME,CONTENT_TYPE,FILE_SIZE,FILE,TABLE_NAME,TABLE_KEY ) VALUES (?,?,?,?,?,? ) ");
+
+
+			log("TABLE_NAME : "+TABLE_NAME);
+			log("TABLE_KEY : "+TABLE_KEY);
+
 
 			int i = 1;
-			
+
 			ps.setString(i++, fileName);
 			ps.setString(i++, contentType);
 			ps.setLong(i++, fileSize);
-			
+
+
+
 			// ps.setBinaryStream(i++, fis, (int)uploadedFile.length()); // int 로 캐스팅 안하면 에러남
 
 			ps.setBinaryStream(i++, bis, bis.available());
 			// ps.setBlob(i++, bis, bis.available());
 
+
+			ps.setString(i++, TABLE_NAME);
+			ps.setLong(i++, Long.parseLong(TABLE_KEY));
+
 			tf = ps.executeUpdate();
-			
+
 			rs = ps.executeQuery("select last_insert_id() AS AUTO_KEY from all_img_info ");
-			
+
 			long auto_key = 0;
-			
+
 			if(rs.first()){
-				auto_key = rs.getLong(1);				
+				auto_key = rs.getLong(1);
 			}
-			
+
 
 			con.commit();
-			
+
 			uploadedFileName = String.valueOf(auto_key);
-																	
+
 		} catch (Exception e) {
 
 			System.out.print(e);
@@ -206,12 +226,12 @@ public class FileUploadServlet extends HttpServlet {
 			con.close();
 			bis.close();
 		}
-		
-		
-		
+
+
+
 		FileInfoModel fileInfoModel = new FileInfoModel(name, fileName,
 				uploadedFileName, fileSize, contentType);
-		
+
 
 		if ("photo".equals(name)) {
 			List<FileInfoModel> photoList = model.getPhoto();
@@ -238,11 +258,11 @@ public class FileUploadServlet extends HttpServlet {
 			model.setDescription(value);
 		}
 	}
-	
-	
+
+
 	public static void main(String[] arg){
-		
-		
+
+
 		System.out.println(System.currentTimeMillis() + UUID.randomUUID().toString());
 	}
 
