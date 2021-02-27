@@ -13,46 +13,46 @@ import javax.servlet.ServletContext;;
 
 
 public class COMMON {
-	
+
 	private org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger( this.getClass() );
 
-	ServletRequest request = null;	
-	
+	ServletRequest request = null;
+
 	EmsHashtable userinfo=null;
 	int sessionHashCode;
-	
+
 	DBManager dbm = null;
-	
+
 	String msg="";
-	
-	
-	
+
+
+
 
 	public COMMON(ServletContext application,ServletRequest request, EmsHashtable userinfo, int sessionHashCode) {
 		this.request = request;
 		this.userinfo = userinfo;
 		this.sessionHashCode=sessionHashCode;
-		
-		
+
+
 		DataSource ds = (DataSource)application.getAttribute("jdbc/mysql_ds");
 
 		dbm = new DBManager(ds);
-		
-		
+
+
 	    String event = request.getParameter("event");
 	    if (event == null) {
 	        event = "find";
 	    }
-	    
-	    
-	    
+
+
+
 	    if(event.equals("find")){
 	    	list();
 	    }else if(event.equals("modify")){
 	    	modify();
 	    	list();
 	    }
-	    
+
 	}
 
 	public void list() {
@@ -61,13 +61,18 @@ public class COMMON {
 
 		String LOGINID = userinfo.getString("LOGINID");
 
+		String P_CD_GROUP_ID = request.getParameter("P_CD_GROUP_ID")==null?"":request.getParameter("P_CD_GROUP_ID");
+		String P_CD_MEANING = request.getParameter("P_CD_MEANING")==null?"":request.getParameter("P_CD_MEANING");
+
+
+
 		try {
-			
+
 			log.info("LOGINID  "+ LOGINID);
- 
-			EmsHashtable[] hash = 
-				dbm.selectMultipleRecord(QueryXMLParser.getQuery(this.getClass(), "common.xml", "list_sql"),new String[] {  LOGINID });
-														
+
+			EmsHashtable[] hash =
+				dbm.selectMultipleRecord(QueryXMLParser.getQuery(this.getClass(), "common.xml", "list_sql"),new String[] {  LOGINID,P_CD_GROUP_ID,P_CD_MEANING });
+
 			request.setAttribute("hash", hash);
 
 		} catch (Exception e) {
@@ -75,10 +80,10 @@ public class COMMON {
 		}
 
 	}
-	
-	
+
+
 	public void modify() {
-				
+
 		String chk[] = request.getParameterValues("chk");
         String PK_CD_ID[] = request.getParameterValues("PK_CD_ID");
         String CD_ID[] = request.getParameterValues("CD_ID");
@@ -92,26 +97,26 @@ public class COMMON {
         Connection con = null;
 
 		try {
-								
+
 			 con  = dbm.getConnection();
-			
+
 			int idx=0;
-			
+
 			for (int i = 0; i < chk.length; i++) {
-				
+
   	        idx = Integer.parseInt(chk[i]);
             log.info(Integer.valueOf(idx));
             dbm.insert(con, QueryXMLParser.getQuery(getClass(), "common.xml", "update_sql"), new String[] {
                 CD_ID[idx], CD_MEANING[idx], SORT_SEQ[idx], PRICE[idx], EXT1[idx], EXT2[idx], CD_GROUP_ID[idx], PK_CD_ID[idx], LOGINID
             });
-				
+
 				msg="수정되었습니다.";
-				
+
 			}
-				
-						
+
+
 			dbm.commitChange(con);
-																	
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			dbm.rollbackChange(con);
@@ -120,6 +125,6 @@ public class COMMON {
 		}
 
 	}
-	
+
 
 }

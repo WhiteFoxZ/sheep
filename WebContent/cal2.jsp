@@ -39,7 +39,11 @@
     int endDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
     int week = cal.get(Calendar.DAY_OF_WEEK);
     String yearMonth = year+"-"+EmsNumberUtil.format(month,"00");
+    String yyyyMM = yearMonth.replaceAll("-", "");
+
     String firstDay = yearMonth+"-01";
+
+
 
 
     String USERNAME="";
@@ -50,13 +54,36 @@
 
     DBManager dbm = new DBManager((DataSource)application.getAttribute("jdbc/mysql_ds"));
 
-    EmsHashtable[] hash = dbm.selectMultipleRecord("SELECT DATE_FORMAT(RESERVE_DATE,'%d') RDATE, count(RESERVE_DATE) CNT FROM reserve_info where LOGIN_ID=? and RESERVE_DATE between ? and LAST_DAY(?) group by DATE_FORMAT(RESERVE_DATE,'%d') ",
+
+
+	//예약정보
+    EmsHashtable[] hash = dbm.selectMultipleRecord("SELECT DATE_FORMAT(RESERVE_DATE,'%Y%m%d') RESERVE_DATE, DATE_FORMAT(RESERVE_DATE,'%d') RDATE, count(RESERVE_DATE) CNT FROM reserve_info where LOGIN_ID=? and RESERVE_DATE between ? and LAST_DAY(?) group by DATE_FORMAT(RESERVE_DATE,'%d') ",
     		new String[] { userinfo.getString("LOGINID"),firstDay,firstDay });
 
 
   	//데크갯수
       EmsHashtable[] hash2 = dbm.selectMultipleRecord("select count(CD_ID) CNT  from comm_info where CD_GROUP_ID='ROOM_NUM' and LOGIN_ID=? ",
       		new String[] { userinfo.getString("LOGINID") });
+
+
+    	//어종
+      EmsHashtable[] hash0 = dbm.selectMultipleRecord("SELECT CD_MEANING as FISH_DAY,EXT1 as FISH_NAME, IFNULL(EXT2,0) AS MAN FROM fishfox.comm_info where CD_GROUP_ID='FISH_TYPE'  and LOGIN_ID=? and CD_MEANING like concat(?,'%') ",
+      		new String[] { userinfo.getString("LOGINID"), yyyyMM });
+
+      EmsHashtable fishHash =new EmsHashtable();
+      EmsHashtable manHash =new EmsHashtable();
+
+
+    for(int hashCnt=0; hashCnt<hash0.length; hashCnt++){
+
+    	fishHash.put(hash0[hashCnt].getString("FISH_DAY"), hash0[hashCnt].getString("FISH_NAME"));
+
+    	log(hash0[hashCnt].getString("FISH_DAY")+" : "+hash0[hashCnt].getString("FISH_NAME"));
+
+    	manHash.put(hash0[hashCnt].getString("FISH_DAY"), hash0[hashCnt].getString("MAN"));
+    }
+
+
 
       String cnt = hash2[0].getString("CNT");
 
@@ -105,20 +132,35 @@
 	color: red;
 }
 
+div.Box {position:relative; width:100%; height:100%;;}
+div.head {float:left; width:100%; height:30%; font-size: 13px;color: red; margin-top: 0px;}
+div.body {clear:left; float:left; width:100%; height:40%; font-size: 21px;  }
+div.foot {position:absolute; clear:left; float:left; width:100%; height:20%; ; bottom:0px; font-size: 13px;color: black;}
+
+div.body2 {clear:left; float:left; width:100px; height:100px; font-size: 18px; display: flex; align-items: center; }
+
+ h1 {
+        width: 100%;
+        padding: 20px 0px;
+
+        text-align: center;
+
+      }
+
 </style>
 
 
 <style>
-
+tbody.tr{height:60px;}
 <%if(mobile){ %>
 table { width:100%;  align:center; }
-
-tr, td { width:14.2%;  height:50px; align:center; text-align: center; }
+tbody.tr, td {   height:80px; align:center; text-align: center; }
 
 
 <%}else{%>
-table,tr,td { width:600px; height:80px; align:center; text-align: center; }
 
+table { width:100%;  align:center; }
+tbody.tr, td {  height:90px; align:center; text-align: center; }
 
 <%}%>
 
@@ -142,16 +184,19 @@ $.mobile.ajaxEnabled = false;
 
 function window_onload()
  {
-    for (var i=2008;i<=2017 ; i++)
+
+
+    for (var i=2021;i<=2030; i++)
    {
         var op= new Option(i+ "년",i);
-         syear.options[i -2008]=op;
+         syear.options[i -2021]=op;
 
 
          if(i== <%=year %> )
          {
-            syear.options[i -2008].selected ="selected" ;
+            syear.options[i -2021].selected ="selected" ;
          }
+
    }
 
    for (var i=1;i<=12 ; i++)
@@ -166,7 +211,7 @@ function window_onload()
    }
 
    var myselect = $( "#syear" );
-   myselect[0].selectedIndex = <%=year%>-2008;
+   myselect[0].selectedIndex = <%=year%>-2021;
    myselect.selectmenu( "refresh" );
 
    var myselect = $( "#smonth" );
@@ -206,16 +251,33 @@ function year_onchange()
 <body onload ="window_onload()" >
 <div data-role="page" data-theme="a">
 
-<div data-role="header">
-<h1><%=USERNAME %></h1>
+<div data-role="header" style='font-size:2em;text-align:center;'>
+<%=USERNAME %>
 </div>
 
-<div data-role="content">
-<!--
-<%=today %><br>
-<%=addMonths %><br>
-<%=afterDay %><br>
-  -->
+<div data-role="content"    style=" padding-bottom: 0px;  padding-top: 0px " >
+
+
+
+<table align="center"  >
+	<thead>
+		<tr>
+			<th>
+			 <select id = "syear" name="syear" data-inline="true"  data-ajax="false" >
+
+			    </select >
+			    &nbsp;
+			     <select   id= "smonth" name="smonth" onchange= "month_onchange()" data-inline="true"  >
+
+			    </select >
+
+			</th>
+
+		</tr>
+	</thead>
+
+</table >
+
 
   <table align="center"  cellspacing= "1" cellpadding= "2" bgcolor ="#cccccc" class="ui-body-d" >
 
@@ -253,41 +315,101 @@ function year_onchange()
 
        tmpDay = year + EmsNumberUtil.format(month, "00")  + EmsNumberUtil.format(i, "00");
 
+
+
+
        if(Integer.parseInt(tmpDay) <= Integer.parseInt(afterDay)  ){	//현재일로 2개월까지만 예약가능
 	   		sb.append("<a href='list.jsp?rdate=").append(yearMonth).append("-").append(EmsNumberUtil.format(i,"00")).append("'>");
        }
 
 	   if(dayHash.getString(EmsNumberUtil.format(i,"00")).length()>0){
 
-	       	int leftSiteCnt = Integer.parseInt(cnt) - Integer.parseInt(dayHash.getString(EmsNumberUtil.format(i,"00")));
+	       	//int leftSiteCnt = Integer.parseInt(cnt) - Integer.parseInt(dayHash.getString(EmsNumberUtil.format(i,"00")));
+
+	       	int totalSiteCnt = Integer.parseInt( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+
+	       	//남은자리수
+	       	int leftSiteCnt = totalSiteCnt - Integer.parseInt(dayHash.getString(EmsNumberUtil.format(i,"00")));
 
 
 
        		if(leftSiteCnt!=0){
 
-       		sb.append(i).append("<br><font class='ui-mini'  >");
-       		sb.append( dayHash.getString(EmsNumberUtil.format(i,"00")) );
-       		sb.append("건 예약");
-       		sb.append("</font>");
+      			sb.append("<div class='head '>");
+      	  		sb.append( fishHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+      	  		sb.append("</div>");
+
+
+	       		sb.append("<div class='body'>");	//날짜
+	       		sb.append(i);	//날짜
+	       		sb.append("</div>");	//날짜
+
+	       		sb.append("<div class='foot'>");
+
+	       		sb.append( dayHash.getString(EmsNumberUtil.format(i,"00")) );
+	       		sb.append("/");
+	       		sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+
+	       		sb.append("</div>");
 
        		}else{
-       			sb.append(i).append("<br><font class='ui-mini_red'   >");
-       			sb.append("예약마감");
-       			sb.append("</font>");
+
+
+
+					sb.append("<div class='head '>");
+					sb.append( fishHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+					sb.append("</div>");
+
+
+					sb.append("<div class='body'>");	//날짜
+					sb.append(i);	//날짜
+					sb.append("</div>");	//날짜
+
+					sb.append("<div class='foot'>");
+
+					sb.append( dayHash.getString(EmsNumberUtil.format(i,"00")) );
+					sb.append("/");
+					sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+					sb.append( "&nbsp;예약마감" );
+
+
+					sb.append("</div>");
+
        		}
 
 
 
 
 	   }else{
-		    sb.append(i);
+
+
+
+		    sb.append("<div class='head '>");
+			sb.append( fishHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+			sb.append("</div>");
+
+
+			sb.append("<div class='body'>");	//날짜
+			sb.append(i);	//날짜
+			sb.append("</div>");	//날짜
+
+			sb.append("<div class='foot'>");
+
+
+			sb.append( manHash.getString(yyyyMM + EmsNumberUtil.format(i,"00")) );
+
+
+			sb.append("</div>");
+
+
+
 	   }
 
 	   if(Integer.parseInt(tmpDay) <= Integer.parseInt(afterDay)  ){	//현재일로 2개월까지만 예약가능
        	sb.append("</a>");
 	   }
 
-       out.println( "<td  bgcolor="+bgColor+ " ><font color="+fontColor+ ">"+sb.toString()+ "</font></td>" );
+       out.println( "<td  bgcolor="+bgColor+ " ><font color="+fontColor+ "><div class='Box'>"+sb.toString()+ "</div></font></td>" );	//최종내용
        newLine++;
 
            if(newLine ==7 &&i!=endDay)
@@ -306,28 +428,13 @@ function year_onchange()
    %>
   </table >
 
-<table align="center" >
-	<thead>
-		<tr>
-			<th>
-			 <select id = "syear" name="syear" data-inline="true"  data-ajax="false" >
 
-			    </select >
-			    &nbsp;
-			     <select   id= "smonth" name="smonth" onchange= "month_onchange()" data-inline="true"  >
-
-			    </select >
-			</th>
-
-		</tr>
-	</thead>
-
-</table >
-
-</div>
-</div>
+</div> <!-- content -->
+</div> <!-- page -->
 </body>
 </html>
+
+
 
 <%
 }else{	//LOGIN 정보가 없을때
@@ -336,4 +443,3 @@ function year_onchange()
 <jsp:include page="userinfo.jsp" flush="true"/>
 
 <%} %>
-

@@ -26,8 +26,8 @@ String remoteIp = request.getRemoteAddr();
 String id = request.getParameter("id");
 String pw = request.getParameter("pw");
 
-if(id==null ) id="TEST";
-if(pw==null ) pw="TEST";
+if(id==null ) id="fish";
+if(pw==null ) pw="fish";
 
 
 

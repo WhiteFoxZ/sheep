@@ -63,16 +63,27 @@ if(userinfo!=null){
 
     String LOGINID = userinfo.getString("LOGINID");
 
+
     //어종
-    EmsHashtable[] fish = dbm.selectMultipleRecord("SELECT EXT1 AS FISH_TYPE FROM comm_info INFO where INFO.CD_GROUP_ID='FISH_TYPE' AND INFO.LOGIN_ID=? AND CD_MEANING =? ",
-    		new String[] { LOGINID ,TO_DAY.replaceAll("-", "") });
+    EmsHashtable[] fish = dbm.selectMultipleRecord("SELECT EXT1 AS FISH_TYPE, IFNULL(EXT2,0) AS MAN FROM comm_info INFO where INFO.CD_GROUP_ID='FISH_TYPE' AND INFO.LOGIN_ID=? AND CD_MEANING =? ",
+    		new String[] { LOGINID ,rdate.replaceAll("-", "") });
 
     String fishtype="";
+    String fishman="";
+    int intMan=0;
+
+
 
     if(fish!=null&& fish.length>0){
     	fishtype=fish[0].getString("FISH_TYPE");
+    	fishman=fish[0].getString("MAN");
+    	intMan = Integer.parseInt(fishman);
+
     }
 
+    //배위치사진
+    EmsHashtable[] postion = dbm.selectMultipleRecord("SELECT CD_MEANING  FROM comm_info INFO where INFO.CD_GROUP_ID='SHIP_POSTION' AND INFO.LOGIN_ID=?  ",
+    		new String[] { LOGINID });
 
 
 
@@ -279,6 +290,14 @@ input[type="text"] {
       }
 
 
+.pre_con{
+
+	padding:1em;
+
+
+}
+
+
 <%}else{ %>
 <!--모바일일경우 폰트 더작게.-->
 .ui-mini {
@@ -299,7 +318,10 @@ font-size: 0.85em;
 	padding-right : 1em;
 	font-size: 0.9em;
 	min-width: 400px;
+
 }
+
+
 <%}%>
 
 
@@ -348,6 +370,9 @@ font-size: 0.85em;
 
 <a class="ui-btn ui-btn3 ui-btn-inline ui-icon-edit ui-btn-icon-left" onclick="setEvent('modify');">입금확인</a>
 <a class="ui-btn ui-btn3 ui-btn-inline ui-icon-edit ui-btn-icon-left" onclick="setEvent('cancel');">입금취소</a>
+
+
+ <a class="ui-btn ui-btn3 ui-btn-inline ui-icon-search ui-btn-icon-left" onclick="setEvent('find');">조회</a>
 <a class="ui-btn ui-btn3 ui-btn-inline ui-icon-delete ui-btn-icon-left" onclick="setEvent('delete');">예약삭제</a>
 
 
@@ -373,7 +398,20 @@ font-size: 0.85em;
 <input type="hidden" name="rdate" value="<%=rdate %>" />
 
 <div class="ui-body ui-body-a">
-  <h1>예약일 : <%=rdate %>&nbsp;<b style="color: red;">[<%=fishtype %>]</b></h1>
+  <h1>예약일 : <%=rdate %>&nbsp;<b style="color: red;">[<%=fishtype %>]</b>
+  
+  자리배치 :
+  
+  <%for(int i=0; i<postion.length; i++){ %>
+
+<a href="<%=postion[i].getString("CD_MEANING") %>" target="_blank" />사진<%=i%></a>&nbsp;|&nbsp;
+
+  <%} %>
+  
+  
+  </h1>  
+  
+  
 
 </div>
 
@@ -393,7 +431,7 @@ if(ADMIN!=null && ADMIN.equals("true")){ %>
 			<th data-priority="<%=idx++ %>">작성일</th>
 			<th data-priority="<%=idx++ %>">이름</th>
 			<th data-priority="<%=idx++ %>">전화</th>
-			<th data-priority="<%=idx++ %>">차량</th>
+			<!-- <th data-priority="<%=idx++ %>">차량</th> -->
 			<th data-priority="<%=idx++ %>">기간</th>
 			<th data-priority="<%=idx++ %>">금액</th>
 			<th data-priority="<%=idx++ %>">메모</th>
@@ -413,7 +451,10 @@ if(ADMIN!=null && ADMIN.equals("true")){ %>
 	<tbody >
 	<%
 	if(hash!=null){
-		for (int i = 0; i < hash.length; i++) {
+
+		for (int i = 0; i < hash.length;  i++) {
+
+			if(intMan>0 && i>=intMan)break;
 	%>
 
 
@@ -428,9 +469,11 @@ if(ADMIN!=null && ADMIN.equals("true")){ %>
 
 			<td><%=hash[i].getString("USER_NAME")%></td>
 			<td><%=hash[i].getString("USER_TEL1")%></td>
+			 <!--
 			<td>
 				<%=hash[i].getString("CAR_NUM")%>
 			</td>
+			 -->
 
 			<td>
 			<%

@@ -51,7 +51,7 @@ StringBuffer sb = new  StringBuffer("");
 
 sb.append("SELECT  \n");
 sb.append(" max(case when CD_ID ='PEOPLE_ADD_CNT' then PRICE else 0 end ) PEOPLE_ADD_CNT \n");
-sb.append(",max(case when CD_ID ='PEOPLE_ADD_CNT' then NULLIF(EXT1,0) else 0 end )PEOPLE_CNT      \n");
+sb.append(",max(case when CD_ID ='PEOPLE_ADD_CNT' then IFNULL(EXT1,0) else 0 end )PEOPLE_CNT      \n");
 sb.append(" FROM comm_info                                                               \n");
 sb.append(" WHERE CD_GROUP_ID='ADD_OPTION'                                               \n");
 sb.append(" AND LOGIN_ID=?                                                               \n");
@@ -287,17 +287,18 @@ max-height: 700px;
             		return false;
             	}
 
-
+/*
             	if(document.frmMain.signup.value==""){
             		showMsg('그림 숫자를 입력해주세요.');
             		return false;
             	}
 
+
             	if(document.frmMain.DAY.value==""){
             		showMsg('기간을 선택해주세요.');
             		return false;
             	}
-
+*/
 
             	if($("#TOTAL_PAY").val()==""){
             		cal();
@@ -439,10 +440,13 @@ max-height: 700px;
 
 
          	if(hot_day_cnt>0){
-         		var html="성수기:"+hot_day_cnt+"일["+HOT_PRICE+"]";
+//         		var html="성수기:"+hot_day_cnt+"일["+HOT_PRICE+"]";
+         		var html=""+hot_day_cnt+"일["+HOT_PRICE+"]";         		
 
          		if(default_day>0)
-         		html=html+"+비성수기:"+default_day+"일["+MAIN_PRICE+"]";
+//        		html=html+"+비성수기:"+default_day+"일["+MAIN_PRICE+"]";
+
+         		html=html+""+default_day+"일["+MAIN_PRICE+"]";
 
          		if(peo_cnt>0)
          		html=html+"+추가인원:"+peo_cnt+"명["+(peo_cnt*peo_unit)+"]";
@@ -455,7 +459,8 @@ max-height: 700px;
 
 
 
-        		var html = "비성수기:"+default_day+"일["+MAIN_PRICE+"]";
+//        		var html = "비성수기:"+default_day+"일["+MAIN_PRICE+"]";
+        		var html = ""+default_day+"일["+MAIN_PRICE+"]";
 
          		if(peo_cnt>0)
          		html=html+"+추가인원:"+peo_cnt+"명["+(peo_cnt*peo_unit)+"]";
@@ -624,7 +629,7 @@ $(function() {
               </li>
 
 
-              <li data-role="fieldcontain">
+              <li data-role="fieldcontain" style="display: none">
 
                            <label for="PEOPLE_ADD_CNT"><H4>추가인원: </H4></label>
 
@@ -637,7 +642,7 @@ $(function() {
               </li>
 
 
-              <li data-role="fieldcontain">
+              <li data-role="fieldcontain" style="display: none">
 
                    <label for="DAY"><H4>기간:
                     <font size="3" color="red">
@@ -654,7 +659,7 @@ $(function() {
                     </label>
 
                      <select name="DAY" id="DAY" data-icon="info" data-iconpos="left" data-native-menu="false">
-                     <option value="">선택하세요</option>
+                     <!-- <option value="">선택하세요</option>  -->
 
 <%for(int i=0;i<hash_money.length; i++){
 	if(!hash_money[i].getString("CD_ID").equals("999")){
@@ -691,12 +696,13 @@ $(function() {
               </li>
 
 
-
+<!--
               <li data-role="fieldcontain">
               		<label for="signup" style="margin-top: 0px;"><img src="jcaptcha"  ></label>
 
               		<input type="text" name="signup" id="signup"  >
               </li>
+ -->
 
               <li data-role="fieldcontain">
 

@@ -275,29 +275,31 @@ public class RoomMadeAction {
 	private  boolean validate()
     {
 
-           Boolean isResponseCorrect =Boolean.FALSE;
-           //remenber that we need an id to validate!
-           String captchaId = request.getSession().getId();
-           //retrieve the response
-           String signup = request.getParameter("signup");
+		return true;
 
-           System.out.println("captchaId = "+captchaId+"    signup -> "+signup);
-
-           // Call the Service method
-            try {
-
-                isResponseCorrect = CaptchaServiceSingleton.getInstance().getImgcapa().validateResponseForID(captchaId,signup);
-
-                // 캡차인증을 두번 호출하면 Exception 발행한다.
-
-            } catch (CaptchaServiceException e) {
-                 //should not happen, may be thrown if the id is not valid
-
-                 request.setAttribute("ERROR_MESSAGE",EmsMessage.MESSAGE66);
-                 e.printStackTrace();
-            }
-
-            return isResponseCorrect.booleanValue();
+//           Boolean isResponseCorrect =Boolean.FALSE;
+//           //remenber that we need an id to validate!
+//           String captchaId = request.getSession().getId();
+//           //retrieve the response
+//           String signup = request.getParameter("signup");
+//
+//           System.out.println("captchaId = "+captchaId+"    signup -> "+signup);
+//
+//           // Call the Service method
+//            try {
+//
+//                isResponseCorrect = CaptchaServiceSingleton.getInstance().getImgcapa().validateResponseForID(captchaId,signup);
+//
+//                // 캡차인증을 두번 호출하면 Exception 발행한다.
+//
+//            } catch (CaptchaServiceException e) {
+//                 //should not happen, may be thrown if the id is not valid
+//
+//                 request.setAttribute("ERROR_MESSAGE",EmsMessage.MESSAGE66);
+//                 e.printStackTrace();
+//            }
+//
+//            return isResponseCorrect.booleanValue();
     }
 
 

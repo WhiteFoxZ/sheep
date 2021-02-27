@@ -14,12 +14,26 @@ if(userinfo!=null){
       event = "find";
   }
 
+
+  String P_CD_GROUP_ID = request.getParameter("P_CD_GROUP_ID")==null?"":request.getParameter("P_CD_GROUP_ID");
+
+  String P_CD_MEANING = request.getParameter("P_CD_MEANING")==null?"":request.getParameter("P_CD_MEANING");
+
+
+
   int sessionHashCode = session.getId().hashCode();
 
   COMMON book = new COMMON(application,request, userinfo, sessionHashCode);
 
 
   EmsHashtable[] hash  = (EmsHashtable[])request.getAttribute("hash");
+
+  DataSource ds = (DataSource)application.getAttribute("jdbc/mysql_ds");
+
+  DBManager dbm = new DBManager(ds);
+
+  EmsHashtable[] hash2 = dbm.selectMultipleRecord("SELECT CD_GROUP_ID,CD_GROUP_NM FROM fishfox.comm_info   group by CD_GROUP_ID,CD_GROUP_NM  order by CD_GROUP_ID ",
+    		new String[] { });
 
 
 
@@ -99,6 +113,17 @@ if(userinfo!=null){
         </script>
 
 <style type="text/css">
+	.ui-datepicker-trigger {
+		vertical-align: middle;
+		cursor: pointer;
+		border-width:1px; background-color:#E9F3FE; border-color:#404040;font:12px;text-align: left; padding-left:2px;
+
+	}
+
+</style>
+
+
+<style type="text/css">
 
 <%if(!mobile){ %>
 
@@ -112,9 +137,18 @@ table.lamp th,td {
 }
 
 
-.input1         {font-family:"돋움","Verdana"; font: 12px;width:130;margin-top:1px}
 
 
+input[type="text"] {
+        width:120px;
+        height:30px;
+      }
+
+select {
+        width:120px;
+        height:30px;
+
+      }
 
 
 <%}else{ %>
@@ -146,22 +180,39 @@ table.lamp th,td {
 
                <div class="content" data-role="content">
 
-<table width="100%" border=0>
+<table align="right" >
+<thead>
 <tr>
-<td >
+<th >
+
+CD_GROUP_NM:
+<select name="P_CD_GROUP_ID" data-role="none"  class="ui-datepicker-trigger ui-mini" style="margin-right:50px;" >
+
+<option value="%">선택하세요</option>
+
+<%=EmsOption.getOption(hash2,"CD_GROUP_ID","CD_GROUP_NM",P_CD_GROUP_ID) %>
+
+</select>
+
+CD_MEANING:
+<input type="text" name="P_CD_MEANING" value="<%=P_CD_MEANING%>" data-role="none"  class="ui-datepicker-trigger ui-mini" style="margin-right:50px;" >
+
 
 <%if(mobile){ %>
+<a class="ui-btn ui-btn-inline ui-mini ui-icon-search ui-btn-icon-left" onclick="setEvent('find');">조회</a>
 
 <a class="ui-btn ui-btn-inline ui-mini ui-icon-edit ui-btn-icon-left" onclick="setEvent('modify');">수정</a>
 
 <%}else{ %>
+<a class="ui-btn ui-btn-inline ui-icon-search ui-btn-icon-left" onclick="setEvent('find');">조회</a>
 
 <a class="ui-btn ui-btn-inline ui-icon-edit ui-btn-icon-left" onclick="setEvent('modify');">수정</a>
 
 <%} %>
 
-	</td>
+	</th>
 </tr>
+</thead>
 </table>
 
 
