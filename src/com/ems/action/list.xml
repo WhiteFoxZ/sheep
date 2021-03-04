@@ -77,7 +77,7 @@ SELECT A.CD_ID ,A.CD_MEANING
 	 <delete_tel_sql id="delete_tel_sql" desc="어드민 예약 삭제" >
 		 <![CDATA[
 delete from reserve_info
-			WHERE GROUP_KEY=? and REPLACE(USER_TEL1 ,'-','')=REPLACE(?,'-','') AND LOGIN_ID=?
+			WHERE GROUP_KEY=? and USER_TEL1=? AND LOGIN_ID=?
 		 ]]>
 	 </delete_tel_sql>
 

@@ -3,7 +3,10 @@
 import com.ems.common.util.*;
 import com.ems.common.dbcp.DBManager;
 import com.ems.common.dbcp.DataSource;
+import com.ems.common.encrypt.AES256Util;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.sql.*;
 
 import javax.servlet.ServletRequest;
@@ -37,6 +40,10 @@ public class LIST {
 
 	    String event = request.getParameter("event");
 	    String pageid = request.getParameter("pageid");	//pageid 값을 체크해서 미입급 리스트로 갈지를 체크한다.
+
+	    log.debug("pageid : "+pageid);
+	    log.debug("event : "+event);
+
 
 
 	    if (event == null) {
@@ -298,6 +305,30 @@ public class LIST {
 		String pk_key = request.getParameter("pk_key");
 		String pk_pw = request.getParameter("pk_pw");
 
+		log.debug("pk_pw : "+pk_pw);
+
+		pk_pw = RoomMadeAction.converTel(pk_pw);
+
+		log.debug("pk_pw : "+pk_pw);
+
+
+		try {
+			AES256Util aes = new AES256Util("asdwsx1031902461");
+			try {
+				pk_pw = aes.encrypt(pk_pw);
+
+				log.debug("pk_pw : "+pk_pw);
+
+			} catch (GeneralSecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+
 		Connection con=null;
 
 		LOGINID = userinfo.getString("LOGINID");
@@ -307,7 +338,7 @@ public class LIST {
 			 con  = dbm.getConnection();
 
 
-			int i = dbm.insert(con , QueryXMLParser.getQuery(this.getClass(), "list.xml", "delete_tel_sql")
+			int i = dbm.delete(con , QueryXMLParser.getQuery(this.getClass(), "list.xml", "delete_tel_sql")
 					,new String[] {pk_key,pk_pw, LOGINID });
 
 			if (i>0 )

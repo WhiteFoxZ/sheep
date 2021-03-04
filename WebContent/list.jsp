@@ -66,7 +66,7 @@ if(userinfo!=null){
 
 
     //어종
-    EmsHashtable[] fish = dbm.selectMultipleRecord("SELECT EXT1 AS FISH_TYPE, IFNULL(EXT2,0) AS MAN FROM comm_info INFO where INFO.CD_GROUP_ID='FISH_TYPE' AND INFO.LOGIN_ID=? AND CD_MEANING =? ",
+    EmsHashtable[] fish = dbm.selectMultipleRecord("SELECT EXT1 AS FISH_TYPE, case when EXT2='' then 0 else ifnull(EXT2,0) end AS MAN FROM comm_info INFO where INFO.CD_GROUP_ID='FISH_TYPE' AND INFO.LOGIN_ID=? AND CD_MEANING =? ",
     		new String[] { LOGINID ,rdate.replaceAll("-", "") });
 
     String fishtype="";

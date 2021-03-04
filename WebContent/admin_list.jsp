@@ -36,7 +36,9 @@ $.mobile.ajaxEnabled = false;
 <ul data-role="listview" data-inset="true">
 	<li data-role="fieldcontain" data-icon="gear" ><a href="common.jsp" data-transition="fade"   >환경설정</a></li>
 	<li data-role="fieldcontain" data-icon="search" ><a href="list.jsp" data-transition="fade"  >예약조회</a></li>
-	<li data-role="fieldcontain" data-icon="search" ><a href="list2.jsp?pageid=list2" data-transition="fade"  >미입금대상</a></li>	
+	<li data-role="fieldcontain" data-icon="search" ><a href="list2.jsp?pageid=list2" data-transition="fade"  >미입금대상</a></li>
+	<li data-role="fieldcontain" data-icon="search" ><a href="admin_pass.jsp" data-transition="fade"  >패스워드변경</a></li>
+
 	<li data-role="fieldcontain" data-icon="action"><a href="logout_admin.jsp"  >LogOut</a></li>
 </ul>
 

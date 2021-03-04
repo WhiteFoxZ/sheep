@@ -42,7 +42,7 @@ if(hash!=null && hash.length>0){
 
 	session.setAttribute("userinfo",hash[0]);
 	session.setAttribute("ADMIN","true");		//어드민세션관리
-	session.setMaxInactiveInterval(60*60*24);	//1일
+	session.setMaxInactiveInterval(60*30);	//30분
 	//session.setMaxInactiveInterval(10);	//10초
 	//log(hash[0].toString());
 

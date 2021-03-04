@@ -47,26 +47,6 @@ if(userinfo!=null){
 
 
 
-StringBuffer sb = new  StringBuffer("");
-
-sb.append("SELECT  \n");
-sb.append(" max(case when CD_ID ='PEOPLE_ADD_CNT' then PRICE else 0 end ) PEOPLE_ADD_CNT \n");
-sb.append(",max(case when CD_ID ='PEOPLE_ADD_CNT' then IFNULL(EXT1,0) else 0 end )PEOPLE_CNT      \n");
-sb.append(" FROM comm_info                                                               \n");
-sb.append(" WHERE CD_GROUP_ID='ADD_OPTION'                                               \n");
-sb.append(" AND LOGIN_ID=?                                                               \n");
-
-
-	//추가인원단가
-    EmsHashtable[] hash_option = dbm.selectMultipleRecord(sb.toString(),
-    		new String[] { LOGINID });
-
-
-    String PEOPLE_ADD_CNT = hash_option[0].getString("PEOPLE_ADD_CNT");
-
-    int PEOPLE_CNT = Integer.parseInt( hash_option[0].getString("PEOPLE_CNT") );
-
-
 
 
 
@@ -85,13 +65,10 @@ sb.append(" AND LOGIN_ID=?                                                      
     message =  deck_desc +"<P>"+ message;
 
 
-	//1박금액 lov
-    EmsHashtable[] hash_money = dbm.selectMultipleRecord("SELECT CD_ID,CD_MEANING,PRICE FROM comm_info WHERE CD_GROUP_ID='DAY_MONEY'  AND LOGIN_ID=? ",
-    		new String[] { LOGINID });
-
-	//성수기기간
-    EmsHashtable[] hot_day = dbm.selectMultipleRecord("SELECT CD_ID,CD_MEANING,PRICE FROM comm_info WHERE CD_GROUP_ID='HOT_DAY' AND LOGIN_ID=? ",
-    		new String[] { LOGINID });
+	//1박금액 ,고기어종
+    EmsHashtable[] hash_money = dbm.selectMultipleRecord(
+    		"SELECT CD_ID,CD_MEANING as FISH_TYPE ,PRICE FROM comm_info WHERE CD_GROUP_ID='DAY_MONEY'  AND LOGIN_ID=? and CD_MEANING = (SELECT EXT1 FROM comm_info WHERE CD_GROUP_ID='FISH_TYPE' AND LOGIN_ID=?  and CD_MEANING=? ) ",
+    		new String[] {LOGINID, LOGINID,rdate.replaceAll("-", "") });
 
 
 	//기간을 몇일까지 가져올지 체크
@@ -314,9 +291,7 @@ max-height: 700px;
             	}
 */
 
-            	if($("#TOTAL_PAY").val()==""){
-            		cal();
-            	}
+				cal();
 
 
             	setEvent(event);
@@ -405,87 +380,19 @@ max-height: 700px;
 
  			var rdate = moment('<%=rdate%>',"YYYY-MM-DD");
 
-        	//radte = rdate.add(2,'months').add(-1,'days');
-
-        	//alert(rdate.format('YYYY-MM-DD'));
-
-        	var FROM_DAY = $("#FROM_DAY").val();	//성수기시작
-
-        	var TO_DAY   = $("#TO_DAY").val() ;	//성수기 종료
+        	var MAIN_PRICE = parseInt($("#price").val());
 
 
-        	//성수기 기간에 포함된 일자 계산 + 성수기 기간이 아닌 일자 계산
-
-
-        	var hot_day_cnt=0;
-        	var default_day =0;
-
-        	for(var i=0; i<DAY; i++){
-
-        		if(rdate.add(i,'days').isBetween( FROM_DAY, TO_DAY )){	//moment('2010-10-20').isBetween('2010-10-19', '2010-10-25'); // true
-        			hot_day_cnt++;
-        		}else{
-        			default_day++;
-        		}
-
-        	}
-
-        	//alert("hot_day_cnt "+hot_day_cnt);
-
-        	//alert("default_day "+default_day);
-
-
-
-        	var MAIN_PRICE = parseInt($("#price_"+default_day).val());
-
-        	var price999 = parseInt($("#price_999").val());	//성수기금액
-
-        	var HOT_PRICE = hot_day_cnt * price999;
-
-        	var peo_cnt = $('select[name="PEOPLE_ADD_CNT"]').val();
-
-        	var peo_unit = <%=PEOPLE_ADD_CNT%>;
-
-
-    		var TOTAL_PAY = MAIN_PRICE + HOT_PRICE +  (peo_cnt*peo_unit);
+    		var TOTAL_PAY = MAIN_PRICE;
 
 
     		 $("#TOTAL_PAY").val( $.number( TOTAL_PAY ) );
 
-
-         	if(hot_day_cnt>0){
-//         		var html="성수기:"+hot_day_cnt+"일["+HOT_PRICE+"]";
-         		var html=""+hot_day_cnt+"일["+HOT_PRICE+"]";
-
-         		if(default_day>0)
-//        		html=html+"+비성수기:"+default_day+"일["+MAIN_PRICE+"]";
-
-         		html=html+""+default_day+"일["+MAIN_PRICE+"]";
-
-         		if(peo_cnt>0)
-         		html=html+"+추가인원:"+peo_cnt+"명["+(peo_cnt*peo_unit)+"]";
+    			var html = "<%=hash_money.length>0?hash_money[0].getString("FISH_TYPE"):"" %> :"+" 일["+$.number( TOTAL_PAY )+"]원";
 
 
         		$("#cal_result").html(html);
         		$("#PRICE_DESC").val(html);
-
-        	}else{
-
-
-
-//        		var html = "비성수기:"+default_day+"일["+MAIN_PRICE+"]";
-        		var html = ""+default_day+"일["+MAIN_PRICE+"]";
-
-         		if(peo_cnt>0)
-         		html=html+"+추가인원:"+peo_cnt+"명["+(peo_cnt*peo_unit)+"]";
-
-
-        		$("#cal_result").html(html);
-        		$("#PRICE_DESC").val(html);
-
-        	}
-
-
 
         }
 
@@ -499,11 +406,6 @@ max-height: 700px;
 
 
     		$("#btnSubmit").hide();
-
-
-        	 $('select[name="PEOPLE_ADD_CNT"]').change(function(){
-        		 cal();
-       		});
 
         	 $('select[name="DAY"]').change(function(){
         		 cal();
@@ -625,15 +527,8 @@ $(function() {
 <input type="hidden" name="ROOM_NUM" id="ROOM_NUM" value="<%=room_num %>" >
 <input type="hidden" name="rdate" id="rdate" value="<%=rdate %>" >
 
-<input type="hidden" name="price_0" id="price_0" value="0" >
-<%for(int i=0;i<hash_money.length; i++){ %>
-<input type="hidden" name="price_<%=hash_money[i].getString("CD_ID") %>" id="price_<%=hash_money[i].getString("CD_ID") %>" value="<%=hash_money[i].getString("PRICE") %>" >
-<%} %>
+<input type="hidden" name="price" id="price" value="<%=hash_money.length>0?hash_money[0].getString("PRICE"):"0" %>" >
 
-<!-- 성수기 기간 -->
-<%for(int i=0;i<hot_day.length; i++){ %>
-<input type="hidden" name="<%=hot_day[i].getString("CD_ID") %>" id="<%=hot_day[i].getString("CD_ID") %>" value="<%=hot_day[i].getString("CD_MEANING") %>" >
-<%} %>
 
 
 
@@ -662,17 +557,6 @@ $(function() {
               </li>
 
 
-              <li data-role="fieldcontain" style="display: none">
-
-                           <label for="PEOPLE_ADD_CNT"><H4>추가인원: </H4></label>
-
-                           <select name="PEOPLE_ADD_CNT" id="PEOPLE_ADD_CNT" data-icon="info" data-iconpos="left" data-native-menu="false">
-
-<%for(int i=0; i<=PEOPLE_CNT; i++){ %>
-                                        <option value="<%=i%>"><%=i%>명</option>
-<%} %>
-                           </select>
-              </li>
 
 
               <li data-role="fieldcontain" style="display: none">

@@ -165,19 +165,7 @@ public class RoomMadeAction {
 		String GROUP_KEY="";
 
 
-		if(USER_TEL1.indexOf("-")<0){
-
-			if(USER_TEL1.length()==10){	//가운데 자리가 3자리
-
-				USER_TEL1 = USER_TEL1.substring(0,3)+"-"+USER_TEL1.substring(3,6)+"-"+USER_TEL1.substring(6);
-
-			}
-
-			if(USER_TEL1.length()==11){	//가운데가 4자리
-				USER_TEL1 = USER_TEL1.substring(0,3)+"-"+USER_TEL1.substring(3,7)+"-"+USER_TEL1.substring(7);
-			}
-
-		}
+		USER_TEL1 = converTel(USER_TEL1);
 
 		Connection con=null;
 
@@ -227,7 +215,7 @@ public class RoomMadeAction {
 		                "1",
 		                GROUP_KEY,
 		                "0",//CAR_ADD_CNT
-		                PEOPLE_ADD_CNT,
+		                "0",//추가인원
 		                TOTAL_PAY.replaceAll(",", ""),
 		                PRICE_DESC
 		            });
@@ -317,6 +305,24 @@ public class RoomMadeAction {
 //
 //            return isResponseCorrect.booleanValue();
     }
+
+
+	public static String converTel(String USER_TEL1 ) {
+		if(USER_TEL1.indexOf("-")<0){	// -표시가 없을경우
+
+			if(USER_TEL1.length()==10){	//가운데 자리가 3자리
+
+				USER_TEL1 = USER_TEL1.substring(0,3)+"-"+USER_TEL1.substring(3,6)+"-"+USER_TEL1.substring(6);
+
+			}
+
+			if(USER_TEL1.length()==11){	//가운데가 4자리
+				USER_TEL1 = USER_TEL1.substring(0,3)+"-"+USER_TEL1.substring(3,7)+"-"+USER_TEL1.substring(7);
+			}
+
+		}
+		return USER_TEL1;
+	}
 
 
 	public static void main(String[] args){

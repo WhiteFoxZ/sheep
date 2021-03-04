@@ -67,7 +67,7 @@
 
 
     	//어종
-      EmsHashtable[] hash0 = dbm.selectMultipleRecord("SELECT CD_MEANING as FISH_DAY,EXT1 as FISH_NAME, IFNULL(EXT2,0) AS MAN FROM fishfox.comm_info where CD_GROUP_ID='FISH_TYPE'  and LOGIN_ID=? and CD_MEANING like concat(?,'%') ",
+      EmsHashtable[] hash0 = dbm.selectMultipleRecord("SELECT CD_MEANING as FISH_DAY,EXT1 as FISH_NAME, case when EXT2='' then 0 else ifnull(EXT2,0) end AS MAN FROM fishfox.comm_info where CD_GROUP_ID='FISH_TYPE'  and LOGIN_ID=? and CD_MEANING like concat(?,'%') ",
       		new String[] { userinfo.getString("LOGINID"), yyyyMM });
 
       EmsHashtable fishHash =new EmsHashtable();
